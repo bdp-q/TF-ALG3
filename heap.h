@@ -3,7 +3,7 @@
 #include "no.h"
 
 typedef struct {
-    No **items;
+    No **itens;
     int tam;
 } Heap;
 

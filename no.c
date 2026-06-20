@@ -14,7 +14,7 @@ No *no_cria(float x, float y, float erro) {
 
     no->erro = erro;
 
-    no->indice_heap = -1;
+    no->heap_index = -1;
 
     return no;
 }
