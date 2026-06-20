@@ -3,8 +3,9 @@
 #include "no.h"
 
 typedef struct {
-    No **items;
+    No **itens;
     int tam;
+    int capacity;
 } Heap;
 
 /*
@@ -12,7 +13,7 @@ typedef struct {
  *
  * Retorno: Heap * se sucesso, NULL se erro
  */
-Heap *heap_cria();
+Heap *heap_cria(int capacity);
 
 /*
  * Adiciona um elemento em um heap seguindo a regra do min-heap
@@ -31,14 +32,14 @@ No *heap_min(Heap *heap);
 /*
  * Remove o primeiro elemento do heap e reorganiza o heap
  * 
- * Retorno: o nó removido se sucesso, NULL se erro
+ * Retorno: 0 se sucesso, 1 se erro
 */
-No *heap_remove_min(Heap *heap);
+int heap_remove_min(Heap *heap);
 
 /*
  * Atualiza o campo erro do no e reorganiza o heap após a alteração
  * 
- * Retorno: posição no Heap se sucesso, -1 se erro
+ * Retorno: 0 se sucesso, 1 se erros
 */
 int heap_update(Heap *heap, No *no, float novo_erro);
 

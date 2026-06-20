@@ -4,22 +4,40 @@
  
 #define TAM_MAX 100
 
-static Heap heap;
-static No *itens[TAM_MAX];
+/*static Heap heap;
+static No *itens[TAM_MAX];*/
 
-
-Heap *heap_cria()
+Heap *heap_cria(int capacity)
 {
-    heap.itens = itens;
-    heap.tam = 0;
+    Heap *heap;
+    No **nos;
 
-    return(&heap);
+    heap = malloc(sizeof(Heap));
+    
+    if (heap == NULL)
+        return(NULL);
+
+    nos = malloc(sizeof(No*)* capacity);
+
+    if (nos == NULL)
+    {
+        free(heap);
+        return(NULL);
+    }
+
+    heap-> itens = nos;
+    heap-> tam = 0;
+    heap-> capacity = capacity;
+    
+    return(heap);
 }
-
 
 int heap_insere(Heap *heap, No *no)
 {
     if (heap == NULL || no == NULL)
+        return(-1);
+
+    if (heap-> tam >= heap-> capacity)
         return(-1);
     
     No *aux;
@@ -49,7 +67,7 @@ int heap_insere(Heap *heap, No *no)
 
 No *heap_min(Heap *heap)
 {
-    if (heap == NULL)
+    if (heap == NULL || heap-> tam == 0)
         return(NULL);
     
     return(heap-> itens[0]); 
@@ -133,10 +151,10 @@ int heap_rise (Heap *heap, No *no)
     return(0);
 }
 
-No *heap_remove_min(Heap *heap)
+int heap_remove_min(Heap *heap)
 {
     if (heap == NULL || heap-> tam == 0)
-        return(NULL);
+        return(1);
     
     No* aux;
     
@@ -144,27 +162,31 @@ No *heap_remove_min(Heap *heap)
     
     if (heap-> tam == 1)
     {
+        free(heap-> itens[0]);
         heap-> itens[0] = NULL;
-
+        
         heap-> tam--;
-        return(aux);
+        return(0);
     }
     
     heap-> itens[0] = heap-> itens[heap-> tam-1];
     heap-> itens[0]-> heap_index = 0;
+    heap-> itens[heap-> tam-1] = aux;
     
+    free(heap-> itens[heap-> tam-1]);
     heap-> itens[heap-> tam-1] = NULL;
+    
     heap-> tam--;
 
     if (heap_sink(heap,heap-> itens[0]) == 0)
-        return(aux);
-    return(NULL);
+        return(0);
+    return(1);
 }
 
 int heap_update(Heap *heap, No *no, float novo_erro)
 {
     if (heap == NULL || no == NULL)
-        return(-1);
+        return(1);
     
     int is_lower = 0;
     int check;
@@ -181,14 +203,22 @@ int heap_update(Heap *heap, No *no, float novo_erro)
         
     if (check == 0)    
         return(no-> heap_index);
-    return(-1);
+    return(1);
 }
 
 void heap_destroy(Heap **heap)
 {
-    if (heap == NULL)
+    if (heap == NULL || *heap == NULL)
         return;
+    
+    int i;
 
+    for (i = 0; i < (*heap)-> tam; i++)
+        no_destroy(&(*heap)-> itens[i]);
+    
+    free((*heap)-> itens);
+    free(*heap);
     *heap = NULL;
+
     return;
 }
