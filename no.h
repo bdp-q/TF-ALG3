@@ -7,6 +7,7 @@ typedef struct No {
     struct No *prox;
     struct No *ant;
     float erro; // área ou altura ao quadrado
+    int heap_index;
 } No;
 
 /*
