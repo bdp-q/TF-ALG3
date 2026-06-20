@@ -24,9 +24,9 @@ int lista_append(Lista *lista, No *no);
 
 /*
  * Remove o elemento passado pelo parâmetro
- * 
+ *
  * Retorno: 1 se sucesso, 0 se lista vazia e -1 se erro
-*/
+ */
 int lista_remove(Lista *lista, No *no);
 
 /*
