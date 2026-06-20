@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include <geometria.h>
+#include "geometria.h"
 
 int *ant;
 int *prox;
