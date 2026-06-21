@@ -8,130 +8,157 @@
 #include "lista.h"
 
 No **pontos;
-int modo; // 1 quando -a ; 0 quando -h
+int modo; // 1 quando modo = -a; 0 quando modo = -h
 
-
-
-float calcula_erro(No * ponto)
+// define qual calculo sera realizado de acordo com o modo
+float calcula_erro(No *ponto)
 {
     No *a;
     No *p;
-    
-    a  = ponto->ant;
+
+    a = ponto->ant;
     p = ponto->prox;
 
     if (modo == 1)
-        return area_triangulo(a->x, a->y, ponto->x, ponto->y,p->x, p->y);
+        return area_triangulo(a->x, a->y, ponto->x, ponto->y, p->x, p->y);
     else
-        return altura2_triangulo(a->x, a->y, ponto->x, ponto->y,p->x, p->y);
+        return altura2_triangulo(a->x, a->y, ponto->x, ponto->y, p->x, p->y);
 }
-int main (int argc, char *argv[]){
-    //tratamento dos parametros na linha de comando (peguei de prog 2)
-    if(argc  < 3) {
+
+int main(int argc, char *argv[])
+{
+    // tratamento dos parametros na linha de comando
+    if (argc < 3)
+    {
         printf("Uso: %s {-h ou -a}  {tolerancia em ponto flutuante}\n", argv[0]);
         return 1;
     }
 
     const char *flag = argv[1];
-    const float tolerancia = (float)atof(argv[2]); //função que transforma o que foi escrito em parametro como float
+    const float tolerancia = (float)atof(argv[2]); // função que transforma o que foi escrito em parametro como float
 
-    if(strcmp(flag, "-a") == 0)
+    // define o modo de cálculo e, se inválido, avisa o usuário
+    if (strcmp(flag, "-a") == 0)
         modo = 1;
-
-    else if(strcmp(flag, "-h") == 0)
-        modo = 0; //ao meu ver o jeito mais fácil é ativar uma variavel boolean ()
-        // que vai dentro das funcoes chamadas na main pra indicar se usa a funcao do -a ou a do -h
-    
-    else{
+    else if (strcmp(flag, "-h") == 0)
+        modo = 0;
+    else
+    {
         printf("Flag inválida: Use ou -a (tolerancia baseada na area do triangulo) ou -h (tolerancia baseada na altura)\n");
         return 1;
     }
-    
-    // programa em si
-    int qnt_pares; 
-    scanf("%d",&qnt_pares);
 
+    // inicialização de variáveis do programa em si
+    int qnt_pares;
     Heap *heap;
-    heap = heap_cria(qnt_pares);
-
     Lista *lista;
-    lista = lista_create();
-    // aloca os vetores (OBS: nao sei se vms usar mesmo os vetores alocados)
-    // talvez de p contornar e eu so nao pensei como
-    pontos = malloc(qnt_pares * sizeof(No *));
 
-    //cria os nos
-    for (int i=0; i < qnt_pares;i++){
-        float y;
-        scanf("%f",&y);
-        pontos[i] = no_cria(i+1,y);
-        lista_append(lista, pontos[i]);
+    scanf("%d", &qnt_pares);
+    heap = heap_cria(qnt_pares);
+    lista = lista_create();
+
+    if (!heap || !lista)
+    {
+        printf("Não foi possível iniciar o programa por falta de memória. Tente novamente.\n");
+        return 1;
     }
 
-    //calcula os erros
-    for (int i=1; i < (qnt_pares-1);i++){
+    // alocação de vetor de pontos
+    pontos = malloc(qnt_pares * sizeof(No *));
+
+    // cria os nos os lendo e conectando na lista encadeada
+    for (int i = 0; i < qnt_pares; i++)
+    {
+        float y;
+        scanf("%f", &y);
+        pontos[i] = no_cria(i + 1, y);
+        if (lista_append(lista, pontos[i]) == -1)
+        {
+            printf("Não foi possível adicionar o elemento %d na lista. Tente novamente.\n", i + 1);
+            lista_destroy(&lista);
+            heap_destroy(&heap);
+            free(pontos);
+            return 1;
+        }
+    }
+
+    // calcula os erros
+    for (int i = 1; i < (qnt_pares - 1); i++)
+    {
         No *no = pontos[i];
         no->erro = calcula_erro(no);
-        no->heap_index = heap_insere(heap,no);
+        no->heap_index = heap_insere(heap, no);
     }
 
     No *menor_erro = heap_min(heap);
-    while(menor_erro && menor_erro->erro <= tolerancia){
-        No* ant = menor_erro->ant;
-        No* prox = menor_erro->prox;
-        
+    while (menor_erro && menor_erro->erro <= tolerancia)
+    {
+        No *ant = menor_erro->ant;
+        No *prox = menor_erro->prox;
+
         pontos[menor_erro->x] = NULL;
-            //tem que tratar os erros na teoria
-        //tira o menor_erro da lista encadeada    
-        lista_remove(lista,menor_erro);
-        if(heap_remove_min(heap))
+
+        // tira o menor_erro da lista encadeada e do heap e trata erros
+        if (lista_remove(lista, menor_erro) == -1)
+        {
+            printf("Não foi possível remover o item %d da lista. Tente novamente.\n", (int)menor_erro->x);
+            lista_destroy(&lista);
+            heap_destroy(&heap);
+            free(pontos);
             return 1;
-        //atualiza a posicao no heap com os novos erros
-        if(ant->heap_index != -1 )
-            heap_update(heap,ant,calcula_erro(ant));
-        if(prox->heap_index != -1 )
-            heap_update(heap,ant,calcula_erro(prox));
+        }
+
+        if (heap_remove_min(heap))
+        {
+            printf("Não foi possível remover o item %d do heap. Tente novamente.\n", (int)menor_erro->x);
+            lista_destroy(&lista);
+            heap_destroy(&heap);
+            free(pontos);
+            return 1;
+        }
+
+        // atualiza a posicao dos nos anterior e proximo no heap com os novos erros
+        if (ant->heap_index != -1)
+        {
+            if (heap_update(heap, ant, calcula_erro(ant)))
+            {
+                printf("Não foi possível atualizar o item %d do heap. Tente novamente.\n", (int)ant->x);
+                lista_destroy(&lista);
+                heap_destroy(&heap);
+                free(pontos);
+                return 1;
+            }
+        }
+
+        if (prox->heap_index != -1)
+        {
+            if (heap_update(heap, prox, calcula_erro(prox)))
+            {
+                printf("Não foi possível atualizar o item %d do heap. Tente novamente.\n", (int)prox->x);
+                lista_destroy(&lista);
+                heap_destroy(&heap);
+                free(pontos);
+                return 1;
+            }
+        }
+
+        // menor_erro recebe nova raiz do heap
         menor_erro = heap_min(heap);
     }
+
+    // imprime a lista final
     No *atual = lista->ini;
-    printf("%d\n",lista->tam);
-    while(atual != NULL){
-        printf("%d.0 %g\n",atual->x,atual->y);
+    printf("%d\n", lista->tam);
+    while (atual != NULL)
+    {
+        printf("%d.0 %g\n", atual->x, atual->y);
         atual = atual->prox;
     }
-    /*
 
-    // preenche indexado no UM no vetor, para podermos usar index 0 no resto
-    for (int i = 0; i < qnt_pares; i++)
-        indiceOrig[i] = i + 1.0;
-    
-    // vetor de anterior
-    for (int i=0;i<qnt_pares;i++)
-        ant[i] = i - 1;
-    
-    // vetor de proximo 
-    for (int i=0;i<qnt_pares;i++)
-        prox[i] = i + 1;
-    
-    erro[0] = 1e9;
-    erro[qnt_pares - 1] = 1e9;
-
-    for (int i=1;i<(qnt_pares - 1); i++){
-        no_cria(i,pontos[i],calcula_erro(i));
-    }
-    //chama a função que remove os pontos que possuem tolerância
-    */
-    //printa os pontos que restaram (num outro vetor?!)
-
-    // tem que ser tudo log n
-    
-    // só pra ver se ta tudo certo
-    // mudei para indice Origem, ja que se usar i vai ficar indexado em 0 agr
-
-
+    // libera memoria
     lista_destroy(&lista);
     heap_destroy(&heap);
     free(pontos);
 
-    return 0; 
+    return 0;
 }

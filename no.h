@@ -1,7 +1,8 @@
 #ifndef NO_H
 #define NO_H
 
-typedef struct No {
+typedef struct No
+{
     int x;
     float y;
     struct No *prox;

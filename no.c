@@ -1,12 +1,14 @@
 #include <stdlib.h>
 #include "no.h"
 
-No *no_cria(int x, float y) {
+No *no_cria(int x, float y)
+{
     No *no;
 
-    if(!(no = malloc(sizeof(No))))
+    if (!(no = malloc(sizeof(No))))
         return NULL;
 
+    // inicializacao
     no->ant = NULL;
     no->prox = NULL;
     no->x = x;
@@ -19,8 +21,10 @@ No *no_cria(int x, float y) {
     return no;
 }
 
-void no_destroy(No **no) {
-    if(no && *no) {
+void no_destroy(No **no)
+{
+    if (no && *no)
+    {
         free(*no);
         *no = NULL;
     }
