@@ -2,7 +2,7 @@
 #define NO_H
 
 typedef struct No {
-    float x;
+    int x;
     float y;
     struct No *prox;
     struct No *ant;
@@ -15,7 +15,7 @@ typedef struct No {
  *
  * Retorno: No * se sucesso, NULL se erro
  */
-No *no_cria(float x, float y, float erro);
+No *no_cria(int x, float y);
 
 /*
  * Desaloca a memória utilizada pelo ponteiro *no e faz *no receber NULL

@@ -1,7 +1,7 @@
 #include <stdlib.h>
 #include "no.h"
 
-No *no_cria(float x, float y, float erro) {
+No *no_cria(int x, float y) {
     No *no;
 
     if(!(no = malloc(sizeof(No))))
@@ -12,7 +12,7 @@ No *no_cria(float x, float y, float erro) {
     no->x = x;
     no->y = y;
 
-    no->erro = erro;
+    no->erro = -1;
 
     no->heap_index = -1;
 

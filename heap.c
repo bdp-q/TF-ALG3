@@ -185,12 +185,11 @@ int heap_remove_min(Heap *heap)
 
 int heap_update(Heap *heap, No *no, float novo_erro)
 {
-    if (heap == NULL || no == NULL)
+    if (heap == NULL || no == NULL || no->heap_index == -1)
         return(1);
     
     int is_lower = 0;
     int check;
-
     if (heap-> itens[no-> heap_index]-> erro > novo_erro)
         is_lower = 1;
     
@@ -208,13 +207,8 @@ int heap_update(Heap *heap, No *no, float novo_erro)
 
 void heap_destroy(Heap **heap)
 {
-    if (heap == NULL || *heap == NULL)
+    if (heap == NULL || *heap == NULL )
         return;
-    
-    int i;
-
-    for (i = 0; i < (*heap)-> tam; i++)
-        no_destroy(&(*heap)-> itens[i]);
     
     free((*heap)-> itens);
     free(*heap);
