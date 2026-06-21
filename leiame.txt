@@ -2,22 +2,22 @@
 
 Trabalho final da matéria de Algoritmos e estruturas de dados 3, ministrada Pelo professor Fabiano Silva na UFPR em 2026.1
 
-_Grupo:_
+*Grupo:*
 
-- Breno Demio Padilha
-- Fernanda Louize Manhães Teles Domingues
-- Paola Siqueira Ceconello
-- Pietro Francisco Andrade Sotile
-- Rafaela Padilha Leitoles
+- Breno Demio Padilha (GRR20252088)
+- Fernanda Louize Manhães Teles Domingues (GRR20253371)
+- Paola Siqueira Ceconello (GRR20254280)
+- Pietro Francisco Andrade Sotile (GRR20251752)
+- Rafaela Padilha Leitoles (GRR20254391)
 
-_Estruturas utilizadas:_
+*Estruturas utilizadas:*
 
 - Vetor pontos[]: mapeia diretamente o índice x de um ponto para o ponteiro de um nó, em O(1). É a "tabela de símbolos" sugerida na especificação.
 - heap_index guardado no No: evita precisar buscar a posição de um nó dentro do heap, fazendo com que o custo de localizar um nó seja O(1). Sem isso, realizar essa operação custaria O(n) (busca linear).
 - Lista duplamente encadeada (ant/prox): permite, dado um nó, achar seu vizinho anterior e seguinte em O(1), e remover um nó do meio da lista em O(1) (só rearranja ant->prox e prox->ant).
 - Min-heap (heap.c): array binário clássico, com heap_index sincronizado em cada troca (heap_insere, heap_sink, heap_rise).
 
-_Porque cada operação custa log n:_
+*Porque cada operação custa log n:*
 
 O heap é uma àrvore binária completa, ou seja, possui altura log n. Tendo isso em vista, bas considerar que toda operação que precisa "subir" ou "descer" um elemento percorre, no máximo, um caminho da raiz até uma folha, ou seja, no máximo log n trocas:
 
@@ -26,7 +26,7 @@ O heap é uma àrvore binária completa, ou seja, possui altura log n. Tendo iss
 - heap_update: já recebe um ponteiro para o nó diretamente (não precisa buscar, porque o nó já tem heap_index), atualiza o campo erro e chama heap_rise ou heap_sink, dependendo se o erro aumentou ou diminuiu → O(log n)
   Assim, encontrar o nó é O(1) (graças ao heap_index armazenado no próprio nó), e reposicioná-lo depois da mudança de valor é O(log n). Essa combinação garante que remover um ponto e atualizar seus dois vizinhos custe O(log n) no máximo, não O(n).
 
-_Por que a execução total é O(n log n):_
+*Por que a execução total é O(n log n):*
 
 A main do programa possui 2 partes principais:
 
